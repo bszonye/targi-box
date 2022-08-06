@@ -9,18 +9,27 @@ Vgame = [194, 194, 45.5];  // box interior
 Hwrap = 33;  // cover art wrap ends here, approximately
 Hmanual = 0.75;
 
+Htray = floor(Vgame.z - Hmanual) - Hfoot;
+
+Ntribe = 45;  // cards in each tribe deck
+Ntborder = 10;  // border cards in the tribe deck tray
+Ngoods = 24;  // cards in goods deck (with expansion)
+Ngborder = 6;  // border cards in the goods deck tray
+Ndune = 20;  // cards in sand dune deck
+
+// distribute extra room evenly between goods & dune decks
+Hstack = Hcard * (Ngoods + Ngborder + Ndune);
+headroom = (Htray - 2*Hfloor - Hstack) / 2;
+Hdune = round(Hcard * Ndune + headroom) + Hfloor;
+Hgoods = Htray - Hdune;
+echo(Hgoods=Hgoods, Hdune=Hdune, total=Hgoods+Hdune);
+
 Qprint = Qfinal;  // or Qdraft
 
 *%box_frame();
-*test_game_shapes($fa=Qdraft);
+test_game_shapes($fa=Qdraft);
 
-space = [15, 32, 15];
-deck = [7.5, 15, 10];
-translate([deck.x, 0]/2) {
-    %translate([space.x-deck.x, 0]/2) box_frame(space, Dgap, false, 0);
-    *%translate([0, 0]/2) prism(deck);
-    *translate([0, space.y-deck.y]/2) flatten(deck, space.x) prism(deck);
-    *translate([0, deck.y-space.y]/2) lean(deck, 54.575) prism(deck);
-    translate([0, space.y-deck.y]/2) flatten(deck, a=60) prism(deck);
-    translate([0, deck.y-space.y]/2) lean(deck, space.x) prism(deck);
-}
+*card_tray(cards=Ntribe+Ntborder, $fa=Qprint);
+*card_tray(height=Hgoods, cards=Ngoods+Ngborder, $fa=Qprint);
+*card_tray(height=Hdune, cards=Ndune, $fa=Qprint);
+*tray_foot($fa=Qprint);
