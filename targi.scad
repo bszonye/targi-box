@@ -29,6 +29,8 @@ Qprint = Qfinal;  // or Qdraft
 *%box_frame();
 test_game_shapes($fa=Qdraft);
 
+*card_tray($fa=Qprint);
+
 *card_tray(cards=Ntribe+Ntborder, $fa=Qprint);
 *card_tray(height=Hgoods, cards=Ngoods+Ngborder, $fa=Qprint);
 *card_tray(height=Hdune, cards=Ndune, $fa=Qprint);
