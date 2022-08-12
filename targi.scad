@@ -29,16 +29,25 @@ Qprint = Qfinal;  // or Qdraft
 
 Vgoods = volume(Vgame.y - Vtray.y, Hceiling/2);
 module goods_tray(color=undef) {
-    vslot = [(Vgoods.x - 4*Dwall)/3, (Vgoods.y - 3*Dwall)/2];
-    echo(Vgoods=Vgoods, vslot=vslot);
+    module slant_well(size, height=undef, rise=0, r=Rint) {
+        v = volume(size, height);
+        hull() {
+            raise(rise) prism(v, height=v.z-rise+Dcut, r=r);
+            translate([0, -rise/2]) prism([v.x, v.y-rise, v.z], r=r);
+        }
+    }
+    hfloor = Hfloor/2;
+    hdiv = Vgoods.z/2;
+    hrise = 18;
+    dslot = (Vgoods.x - 4*Dwall)/3;
+    vslot = [dslot, 48, Vgoods.z-hfloor];
+    vmid = [dslot, Dwall+2*Rint+EPSILON, Vgoods.z-hdiv-hfloor+Dcut];
     colorize(color) difference() {
         prism(Vgoods, r=Rext);
-        hbot = Hfloor/2;
-        hdiv = Vgoods.z/2;
-        for (i=[-1:+1]) translate([i*(vslot.x+Dwall), 0]) {
-            raise(hdiv) prism([vslot.x, Dwall+2*Rint+EPSILON, hdiv+Dcut]);
-            for (j=[-1/2,+1/2]) translate([0, j*(vslot.y+Dwall)])
-                raise(hbot) prism(vslot, height=Vgoods.z-hbot+Dcut, r=Rint);
+        for (i=[-1:+1]) translate([i*(vslot.x+Dwall), 0, hfloor]) {
+            translate([0, Vgoods.y/2 - 3/2*Dwall - vslot.y, hdiv]) prism(vmid);
+            for (j=[-1,+1]) translate([0, j*(Vgoods.y/2-vslot.y/2-Dwall)])
+                slant_well(vslot, height=Vgoods.z-hfloor, rise=hrise-j);
         }
     }
 }
@@ -76,7 +85,7 @@ module organizer() {
     }
 }
 
-*organizer();
+organizer();
 *test_game_shapes($fa=Qdraft);
 
 *card_tray(cards=Ntribe+Ntborder, $fa=Qprint);
@@ -84,4 +93,4 @@ module organizer() {
 *card_tray(height=Hdune, cards=Ndune, $fa=Qprint);
 *tray_foot($fa=Qprint);
 *goods_tray($fa=Qprint);
-points_tray($fa=Qprint);
+*points_tray($fa=Qprint);
