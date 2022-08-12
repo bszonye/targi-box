@@ -52,14 +52,13 @@ module goods_tray(color=undef) {
     }
 }
 
-Vpoints = [Vgame.x - 2*Vtray.x, Vtray.y, Hceiling/2];
+Vpoints = [Vgame.x - 2*Vtray.x, Vgame.y - Vtray.x, Hceiling/2];
 module points_tray(color=undef) {
-    vwell = [Vpoints.x - 2*Dwall, (Vpoints.y - 4*Dwall)/3, Vpoints.z - Hfloor];
+    vwell = [Vpoints.x - 2*Dwall, (Vpoints.y - 5*Dwall)/4, Vpoints.z - Hfloor];
     rscoop = 2*Rext;
-    echo(Vpoints=Vpoints, vwell=vwell, rscoop=rscoop);
     colorize(color) difference() {
         prism(Vpoints, r=Rext);
-        for (i=[-1:+1]) translate([0, i*(vwell.y+Dwall), Hfloor])
+        for (i=[-3/2:+3/2]) translate([0, i*(vwell.y+Dwall), Hfloor])
             scoop_well(vwell, rscoop=rscoop, lip=vwell.z-rscoop);
     }
 }
@@ -67,21 +66,23 @@ module points_tray(color=undef) {
 module organizer() {
     %box_frame();
 
-    module corner_tray(height=undef, cards=0) {
+    for (i=[0,1]) {
         origin = area(Vtray)/2 - area(Vgame)/2 - area(Dgap);
-        translate(volume(origin, Hfoot))
-            card_tray(height=height, cards=cards);
+        translate(volume(origin + [i*(Dgap+Vtray.x), 0], Hfoot))
+            card_tray(cards=Ntribe+Ntborder);
     }
-    for (i=[-1,+1]) scale([i, 1]) corner_tray(cards=Ntribe+Ntborder);
-    rotate(-90) {
-        corner_tray(height=Hdune, cards=Ndune);
-        raise(Hdune+Dgap) corner_tray(height=Hgoods, cards=Ngoods);
+    rotate(90) {
+        origin = area(Vtray)/2 - area(Vgame)/2 - area(Dgap);
+        translate([-origin.x, origin.y, Hfoot]) {
+            card_tray(height=Hdune, cards=Ndune);
+            raise(Hdune+Dgap) card_tray(height=Hgoods, cards=Ngoods);
+        }
     }
     for (i=[0,1]) {
         ogoods = area(Dgap) + area(Vgame)/2 - area(Vgoods)/2;
-        translate(volume(ogoods, i*(Vgoods.z+Dgap))) goods_tray();
-        opoints = [0, Vpoints.y/2 - Vgame.y/2];
-        translate(volume(opoints, i*(Vpoints.z+Dgap))) points_tray();
+        translate([-ogoods.x, ogoods.y, i*(Vgoods.z+Dgap)]) goods_tray();
+        opoints = area(Dgap) + area(Vgame)/2 - area(Vpoints)/2;
+        translate([opoints.x, -opoints.y, i*(Vpoints.z+Dgap)]) points_tray();
     }
 }
 
