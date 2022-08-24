@@ -53,14 +53,11 @@ module goods_tray(color=undef) {
 }
 
 Vpoints = [Vgame.x - 2*Vtray.x, Vgame.y - Vtray.x, Hceiling/2];
-module points_tray(color=undef) {
-    vwell = [Vpoints.x - 2*Dwall, (Vpoints.y - 5*Dwall)/4, Vpoints.z - Hfloor];
-    rscoop = 2*Rext;
-    colorize(color) difference() {
-        prism(Vpoints, r=Rext);
-        for (i=[-3/2:+3/2]) translate([0, i*(vwell.y+Dwall), Hfloor])
-            scoop_well(vwell, rscoop=rscoop, lip=vwell.z-rscoop);
-    }
+module points_tray(size=Vpoints, height=undef, color=undef) {
+    v = volume(size, height);
+    hwell = v.z - Hfloor;
+    r = 2*Rext;
+    scoop_tray(Vpoints, grid=[1, 4], rscoop=r, lip=hwell-r, color=color);
 }
 
 module organizer() {
